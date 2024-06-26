@@ -8,8 +8,8 @@ namespace LMProject.Interfaces
 {
     public interface IAuthorRepository
     {
-        Task<Authors> CreateAsync(Authors authorsModel);
-        Task<List<Authors>> GetAllAsync();
-        Task<Authors?> GetByIdAsync(int id);
+        Task<AuthorsModel> CreateAsync(AuthorsModel authorsModel);
+        Task<List<AuthorsModel>> GetAllAsync();
+        Task<AuthorsModel?> GetByIdAsync(int id);
     }
 }

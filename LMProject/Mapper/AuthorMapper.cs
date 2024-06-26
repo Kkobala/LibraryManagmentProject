@@ -5,7 +5,7 @@ namespace LMProject.Mapper
 {
     public static class AuthorMapper
     {
-        public static AuthorDto ToAuthorDto(this Authors authorsModel)
+        public static AuthorDto ToAuthorDto(this AuthorsModel authorsModel)
         {
             return new AuthorDto
             {
@@ -19,9 +19,9 @@ namespace LMProject.Mapper
             };
         }
 
-        public static Authors ToAuthorFromCreateDTO(this CreateAuthorRequest request)
+        public static AuthorsModel ToAuthorFromCreateDTO(this CreateAuthorRequest request)
         {
-            return new Authors
+            return new AuthorsModel
             {
                 Name = request.Name,
                 LastName = request.LastName,

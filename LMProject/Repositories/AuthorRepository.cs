@@ -14,23 +14,37 @@ namespace LMProject.Repositories
             _db = db;   
         }
 
-        public async Task<Authors> CreateAsync(Authors authorsModel){
+        public async Task<AuthorsModel> CreateAsync(AuthorsModel authorsModel){
             await _db.Authors.AddAsync(authorsModel);
             await _db.SaveChangesAsync();
 
             return authorsModel;
         }
 
-        public async Task<List<Authors>> GetAllAsync()
+        public async Task<List<AuthorsModel>> GetAllAsync()
         {
             return await _db.Authors.ToListAsync();
         }
 
-        public async Task<Authors?> GetByIdAsync(int id)
+        public async Task<AuthorsModel?> GetByIdAsync(int id)
         {
             return await _db.Authors
                 .Include(b => b.Books)
                 .FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<List<AuthorsModel>> GetAuthorWithBooks(Books books)
+        {
+            return await _db.JoinedTables
+                .Where(b => b.BookId == books.Id)
+                .Select(author => new AuthorsModel
+                {
+                    Id = author.AuthorId,
+                    Books = author.Author.Books,
+                    Name = author.Author.Name,
+                    LastName = author.Author.LastName,
+                    DateOfBirth = author.Author.DateOfBirth,
+                }).ToListAsync();
         }
     }
 }

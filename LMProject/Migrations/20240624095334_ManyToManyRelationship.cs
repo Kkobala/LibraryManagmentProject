@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LMProject.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class ManyToManyRelationship : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Authors",
+                name: "AuthorsModel",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -32,6 +32,7 @@ namespace LMProject.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    AuthorId = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PublishedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -54,7 +55,7 @@ namespace LMProject.Migrations
                     table.ForeignKey(
                         name: "FK_AuthorsBooks_Authors_AuthorsId",
                         column: x => x.AuthorsId,
-                        principalTable: "Authors",
+                        principalTable: "AuthorsModel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -65,10 +66,39 @@ namespace LMProject.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "JoinedTables",
+                columns: table => new
+                {
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    AuthorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinedTables", x => new { x.AuthorId, x.BookId });
+                    table.ForeignKey(
+                        name: "FK_JoinedTables_Authors_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "AuthorsModel",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JoinedTables_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AuthorsBooks_BooksId",
                 table: "AuthorsBooks",
                 column: "BooksId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinedTables_BookId",
+                table: "JoinedTables",
+                column: "BookId");
         }
 
         /// <inheritdoc />
@@ -78,7 +108,10 @@ namespace LMProject.Migrations
                 name: "AuthorsBooks");
 
             migrationBuilder.DropTable(
-                name: "Authors");
+                name: "JoinedTables");
+
+            migrationBuilder.DropTable(
+                name: "AuthorsModel");
 
             migrationBuilder.DropTable(
                 name: "Books");

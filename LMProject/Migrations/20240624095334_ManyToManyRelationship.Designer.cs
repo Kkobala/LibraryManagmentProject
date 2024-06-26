@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240619093313_Initial")]
-    partial class Initial
+    [Migration("20240624095334_ManyToManyRelationship")]
+    partial class ManyToManyRelationship
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,10 +37,10 @@ namespace LMProject.Migrations
 
                     b.HasIndex("BooksId");
 
-                    b.ToTable("AuthorsBooks", (string)null);
+                    b.ToTable("AuthorsBooks");
                 });
 
-            modelBuilder.Entity("LMProject.Models.Authors", b =>
+            modelBuilder.Entity("LMProject.Models.AuthorsModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace LMProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Authors");
+                    b.ToTable("AuthorsModel");
                 });
 
             modelBuilder.Entity("LMProject.Models.Books", b =>
@@ -71,6 +71,9 @@ namespace LMProject.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -88,9 +91,24 @@ namespace LMProject.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("LMProject.Models.JoinTables", b =>
+                {
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AuthorId", "BookId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("JoinedTables");
+                });
+
             modelBuilder.Entity("AuthorsBooks", b =>
                 {
-                    b.HasOne("LMProject.Models.Authors", null)
+                    b.HasOne("LMProject.Models.AuthorsModel", null)
                         .WithMany()
                         .HasForeignKey("AuthorsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -101,6 +119,35 @@ namespace LMProject.Migrations
                         .HasForeignKey("BooksId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("LMProject.Models.JoinTables", b =>
+                {
+                    b.HasOne("LMProject.Models.AuthorsModel", "Author")
+                        .WithMany("AuthorsBooks")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LMProject.Models.Books", "Book")
+                        .WithMany("AuthorsBooks")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Book");
+                });
+
+            modelBuilder.Entity("LMProject.Models.AuthorsModel", b =>
+                {
+                    b.Navigation("AuthorsBooks");
+                });
+
+            modelBuilder.Entity("LMProject.Models.Books", b =>
+                {
+                    b.Navigation("AuthorsBooks");
                 });
 #pragma warning restore 612, 618
         }

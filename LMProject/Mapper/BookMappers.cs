@@ -13,7 +13,7 @@ namespace LMProject.Mapper
                 Title = booksModel.Title,
                 PublishedDate = booksModel.PublishedDate,
                 Description = booksModel.Description,
-                Authors = booksModel.Authors.Select(a => a.ToAuthorDto()).ToList()
+               // Authors = booksModel.Authors.Select(a => a.ToAuthorDto()).ToList()
             };
         }
 
@@ -24,7 +24,7 @@ namespace LMProject.Mapper
                 Title = request.Title,
                 Description = request.Description,
                 PublishedDate = request.PublishedDate,
-                Authors = request.AuthorIds.Select(id => new Authors { Id = id }).ToList()
+                //AuthorsModel = request.AuthorIds.Select(id => new AuthorsModel { Id = id }).ToList()
             };
         }
     }

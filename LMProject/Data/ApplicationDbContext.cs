@@ -16,16 +16,24 @@ namespace LMProject.Data
         }
 
         public DbSet<Books> Books { get; set; }
-        public DbSet<Authors> Authors { get; set; }
+        public DbSet<AuthorsModel> Authors { get; set; }
+        public DbSet<JoinTables> JoinedTables { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Books>()
-            .HasMany(a => a.Authors)
-            .WithMany(b => b.Books)
-            .UsingEntity(j => j.ToTable("AuthorsBooks"));
+            modelBuilder.Entity<JoinTables>(x => x.HasKey(ab => new { ab.AuthorId, ab.BookId}));
+
+            modelBuilder.Entity<JoinTables>()
+                .HasOne(a => a.Author)
+                .WithMany(b => b.AuthorsBooks)
+                .HasForeignKey(ab => ab.AuthorId);
+
+            modelBuilder.Entity<JoinTables>()
+                .HasOne(b => b.Book)
+                .WithMany(ab => ab.AuthorsBooks)
+                .HasForeignKey(a => a.BookId);
         }
     }
 }

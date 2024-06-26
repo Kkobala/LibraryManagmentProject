@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LMProject.DTOs.Books.Authors;
 using LMProject.Interfaces;
 using LMProject.Mapper;
+using LMProject.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMProject.Controllers
@@ -15,13 +16,16 @@ namespace LMProject.Controllers
     {
         private readonly IAuthorRepository _repo;
         private readonly IBookRepository _bookRepo;
+        private readonly IAuthorService _service;
 
         public AuthorController(
             IAuthorRepository repo,
-            IBookRepository bookRepo)
+            IBookRepository bookRepo,
+            IAuthorService service)
         {
             _repo = repo;
             _bookRepo = bookRepo;
+            _service = service;
         }
 
         [HttpGet]
@@ -45,10 +49,14 @@ namespace LMProject.Controllers
 
         [HttpPost]
         public async Task<IActionResult> CreateAuthor([FromBody] CreateAuthorRequest request){
-            var author = request.ToAuthorFromCreateDTO();
-            await _repo.CreateAsync(author);
 
-            return CreatedAtAction(nameof(GetAuthorById), new {id = author}, author.ToAuthorDto());
+            //var author = request.ToAuthorFromCreateDTO();
+            //await _repo.CreateAsync(author);
+
+            //return CreatedAtAction(nameof(GetAuthorById), new {id = author}, author.ToAuthorDto());
+
+            var author = await _service.CreateAuthorAsync(request);
+            return Ok(author);
         }
     }
 }

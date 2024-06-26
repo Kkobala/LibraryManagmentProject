@@ -54,11 +54,10 @@ namespace LMProject.Repositories
             .ToListAsync();
         }
 
-        public async Task<Books?> GetById(int id /*, int authorId*/)
+        public async Task<Books?> GetById(int id)
         {
             var book = await _db.Books
             .Include(a => a.Authors)
-            //.Where(a => a.AuthorId == authorId)
             .FirstOrDefaultAsync(b => b.Id == id);
 
             if (book == null)

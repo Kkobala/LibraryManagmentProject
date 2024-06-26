@@ -1,4 +1,4 @@
-using LMProject.DTOs.Books.Authors;
+using LMProject.Models;
 
 namespace LMProject.DTOs.Books
 {
@@ -10,6 +10,6 @@ namespace LMProject.DTOs.Books
         public DateTime PublishedDate { get; set; }
         public string Description { get; set; } = string.Empty;
 
-        public List<AuthorDto> Authors { get; set; }
+        public List<AuthorsModel> Authors { get; set; }
     }
 }

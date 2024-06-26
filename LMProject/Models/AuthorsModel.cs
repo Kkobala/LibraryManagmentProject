@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LMProject.Models
 {
-    public class Authors
+    public class AuthorsModel
     {
         [Key]
         public int Id { get; set; }
@@ -12,6 +12,7 @@ namespace LMProject.Models
         public DateTime DateOfBirth { get; set; }
 
 
-        public ICollection<Books> Books { get; set; }
+        public List<Books> Books { get; set; } = [];
+        public List<JoinTables> AuthorsBooks { get; set; } = [];
     }
 }
