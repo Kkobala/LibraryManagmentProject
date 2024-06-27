@@ -15,45 +15,38 @@ namespace LMProject.Controllers
     public class AuthorController : ControllerBase
     {
         private readonly IAuthorRepository _repo;
-        private readonly IBookRepository _bookRepo;
         private readonly IAuthorService _service;
 
         public AuthorController(
             IAuthorRepository repo,
-            IBookRepository bookRepo,
             IAuthorService service)
         {
             _repo = repo;
-            _bookRepo = bookRepo;
             _service = service;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll(){
-            var author = await _repo.GetAllAsync();
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var authorsDto = author.Select(s => s.ToAuthorDto());
-            return Ok(authorsDto);
+            var author = await _repo.GetAllAsync();
+            return Ok(author);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetAuthorById(int id){
-            var author = await _repo.GetByIdAsync(id);
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetAuthorById([FromRoute] int id){
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if(author == null){
-                return NotFound();
-            }
-
-            return Ok(author.ToAuthorDto());
+            var author = await _service.GetAuthorsWithBooks(id);
+            return Ok(author);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAuthor([FromBody] CreateAuthorRequest request){
-
-            //var author = request.ToAuthorFromCreateDTO();
-            //await _repo.CreateAsync(author);
-
-            //return CreatedAtAction(nameof(GetAuthorById), new {id = author}, author.ToAuthorDto());
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var author = await _service.CreateAuthorAsync(request);
             return Ok(author);

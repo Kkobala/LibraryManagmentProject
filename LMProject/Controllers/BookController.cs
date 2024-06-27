@@ -1,14 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using LMProject.Data;
 using LMProject.DTOs.Books;
 using LMProject.Interfaces;
-using LMProject.Mapper;
 using LMProject.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMProject.Controllers
 {
@@ -18,71 +11,75 @@ namespace LMProject.Controllers
     {
         private readonly IBookRepository _repo;
         private readonly IBookService _service;
-        private readonly IAuthorRepository _authRepo;
 
         public BookController(
             IBookRepository repo,
-            IBookService service,
-            IAuthorRepository authRepo)
+            IBookService service)
         {
             _repo = repo;
             _service = service;
-            _authRepo = authRepo;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(){
+        public async Task<IActionResult> GetAll()
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var books = await _repo.GetAllAsync();
 
-            var bookDto = books.Select(s => s.ToBookDTO());
-
-            return Ok(bookDto);
+            return Ok(books);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetBooksWithAuthorsAsync([FromRoute] int id){
-            //var book = await _repo.GetById(id);
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetBooksWithAuthorsAsync([FromRoute] int id)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var author = await _authRepo.GetByIdAsync(id);
+            var book = await _repo.GetById(id);
 
-            if (author == null)
-                throw new ArgumentNullException($"auhtor with this {id} id cannot be found!");
-
-            var book = await _service.GetBooksWithAuthors(author);
+            if (book == null)
+                throw new ArgumentNullException($"book with this {id} id cannot be found!");
 
             return Ok(book);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTheBook([FromBody] CreateBookRequest bookDTO){
-
-            //var bookModel = bookDTO.ToBookFromCreateDTO();
-            //await _repo.CreateAsync(bookModel);
-
-            //return CreatedAtAction(nameof(GetBookById), new { id = bookModel.Id }, bookModel.ToBookDTO());
+        public async Task<IActionResult> CreateTheBook([FromBody] CreateBookRequest bookDTO)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var book = await _service.CreateBookAsync(bookDTO);
             return Ok(book);
         }
 
         [HttpPut]
-        [Route("{id}")]
-        public async Task<IActionResult> UpdateTheBook([FromRoute] int id, [FromBody] UpdateBookRequestDto bookDto){
+        [Route("{id:int}")]
+        public async Task<IActionResult> UpdateTheBook([FromRoute] int id, [FromBody] UpdateBookRequestDto bookDto)
+        {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var book = await _repo.UpdateAsync(id, bookDto);
-            
-            if(book == null){
+
+            if (book == null)
+            {
                 return NotFound("Book can not be found");
             }
 
-            return Ok(book.ToBookDTO());
+            return Ok(book);
         }
 
         [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> DeleteBook([FromRoute] int id){
+        [Route("{id:int}")]
+        public async Task<IActionResult> DeleteBook([FromRoute] int id)
+        {
             var book = await _repo.DeleteAsync(id);
 
-            if(book == null){
+            if (book == null)
+            {
                 return NotFound("Book can not be found");
             }
 

@@ -49,19 +49,5 @@ namespace LMProject.Services
                 Authors = new List<AuthorsModel> { author }
             };
         }
-
-        public async Task<List<Books>> GetBooksWithAuthors(AuthorsModel authors)
-        {
-            return await _db.JoinedTables
-                .Where(b => b.AuthorId == authors.Id)
-                .Select(book => new Books
-                {
-                    Id = book.BookId,
-                    Authors = book.Book.Authors,
-                    Title = book.Book.Title,
-                    Description = book.Book.Description,
-                    PublishedDate = book.Book.PublishedDate,
-                }).ToListAsync();
-        }
     }
 }

@@ -1,44 +1,36 @@
-﻿using LMProject.Data;
-using LMProject.DTOs.Books.Authors;
+﻿using LMProject.DTOs.Books.Authors;
 using LMProject.Interfaces;
-using LMProject.Models;
-using Microsoft.EntityFrameworkCore;
+using LMProject.Mapper;
 
 namespace LMProject.Services
 {
-    public class AuthorService: IAuthorService
+    public class AuthorService : IAuthorService
     {
         private readonly IAuthorRepository _repo;
-        private readonly ApplicationDbContext _db;
 
         public AuthorService(
-            IAuthorRepository repo,
-            ApplicationDbContext db)
+            IAuthorRepository repo)
         {
             _repo = repo;
-            _db = db;
         }
 
-        //var books = await _db.Books.Where(b => b.Id == request.BookId).ToListAsync();
-        //Books = books
         public async Task<AuthorDto> CreateAuthorAsync(CreateAuthorRequest request)
         {
-            var author = new AuthorsModel
-            {
-                Name = request.Name,
-                LastName = request.LastName,
-                DateOfBirth = request.DateOfBirth,
-            };
+            var author = request.ToAuthorFromCreateDTO();
 
             await _repo.CreateAsync(author);
 
-            return new AuthorDto
-            {
-                Id= author.Id,
-                Name = request.Name,
-                LastName = request.LastName,
-                DateOfBirth = request.DateOfBirth
-            };
+            return author.ShowCreatedAuthorDto();
+        }
+
+        public async Task<AuthorDto> GetAuthorsWithBooks(int id)
+        {
+            var author = await _repo.GetByIdAsync(id);
+
+            if (author == null)
+                throw new ArgumentNullException($"Author with ID {id} not found!");
+
+            return author.ToAuthorDto();
         }
     }
 }

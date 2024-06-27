@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using LMProject.Data;
 using LMProject.DTOs.Books;
 using LMProject.Interfaces;
@@ -36,7 +32,7 @@ namespace LMProject.Repositories
             var book = await _db.Books
             .Include(b => b.Authors)
             .FirstOrDefaultAsync(x => x.Id == id);
-            
+
             if (book == null)
             {
                 throw new ArgumentNullException($"Book with {id} ID cannot be found");
@@ -50,21 +46,23 @@ namespace LMProject.Repositories
         public async Task<List<Books>> GetAllAsync()
         {
             return await _db.Books
-            .Include(b => b.Authors)
+            .Include(b => b.AuthorsBooks)
+            .ThenInclude(ab => ab.Author)
             .ToListAsync();
         }
 
         public async Task<Books?> GetById(int id)
         {
             var book = await _db.Books
-            .Include(a => a.Authors)
+            .Include(a => a.AuthorsBooks)
+            .ThenInclude(ab => ab.Author)
             .FirstOrDefaultAsync(b => b.Id == id);
 
             if (book == null)
             {
                 throw new ArgumentNullException($"Book with {id} ID cannot be found");
             }
-            
+
             return book;
         }
 
@@ -73,7 +71,7 @@ namespace LMProject.Repositories
             var book = await _db.Books
             .Include(b => b.Authors)
             .FirstOrDefaultAsync(x => x.Id == id);
-            
+
             if (book == null)
             {
                 throw new ArgumentNullException($"Book with {id} ID cannot be found");
