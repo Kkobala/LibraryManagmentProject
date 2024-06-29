@@ -1,5 +1,7 @@
 using LMProject.DTOs.Books;
+using LMProject.Helpers;
 using LMProject.Interfaces;
+using LMProject.Mapper;
 using LMProject.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,18 +23,18 @@ namespace LMProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var books = await _repo.GetAllAsync();
+            var books = await _repo.GetAllAsync(query);
 
-            return Ok(books);
+            return Ok(books.Select(s => s.ToBookDTO()));
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetBooksWithAuthorsAsync([FromRoute] int id)
+        public async Task<IActionResult> GetBooksByIdAsync([FromRoute] int id)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -42,7 +44,7 @@ namespace LMProject.Controllers
             if (book == null)
                 throw new ArgumentNullException($"book with this {id} id cannot be found!");
 
-            return Ok(book);
+            return Ok(book.ToBookDTO());
         }
 
         [HttpPost]
@@ -69,7 +71,7 @@ namespace LMProject.Controllers
                 return NotFound("Book can not be found");
             }
 
-            return Ok(book);
+            return Ok(book.ToBookDTO());
         }
 
         [HttpDelete]

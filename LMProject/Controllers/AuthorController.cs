@@ -31,7 +31,7 @@ namespace LMProject.Controllers
                 return BadRequest(ModelState);
 
             var author = await _repo.GetAllAsync();
-            return Ok(author);
+            return Ok(author.Select(a => a.ToAuthorDto()));
         }
 
         [HttpGet("{id:int}")]

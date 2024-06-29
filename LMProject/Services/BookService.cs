@@ -1,6 +1,8 @@
 ﻿using LMProject.Data;
 using LMProject.DTOs.Books;
+using LMProject.DTOs.Books.Authors;
 using LMProject.Interfaces;
+using LMProject.Mapper;
 using LMProject.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,7 +48,7 @@ namespace LMProject.Services
                 Title = request.Title,
                 PublishedDate = request.PublishedDate,
                 Description = request.Description,
-                Authors = new List<AuthorsModel> { author }
+                Authors = new List<AuthorDto> { author.ToAuthorDto() }
             };
         }
     }

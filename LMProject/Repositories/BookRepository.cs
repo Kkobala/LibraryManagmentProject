@@ -1,5 +1,6 @@
 using LMProject.Data;
 using LMProject.DTOs.Books;
+using LMProject.Helpers;
 using LMProject.Interfaces;
 using LMProject.Models;
 using Microsoft.EntityFrameworkCore;
@@ -43,12 +44,21 @@ namespace LMProject.Repositories
             return book;
         }
 
-        public async Task<List<Books>> GetAllAsync()
+        public async Task<List<Books>> GetAllAsync(QueryObject query)
         {
-            return await _db.Books
-            .Include(b => b.AuthorsBooks)
-            .ThenInclude(ab => ab.Author)
-            .ToListAsync();
+            var book = _db.Books.Include(b => b.AuthorsBooks).ThenInclude(a => a.Author).AsQueryable();
+
+            if(!string.IsNullOrWhiteSpace(query.Title)){
+                book = book.Where(b => b.Title.Contains(query.Title));
+            }
+
+            if(!string.IsNullOrWhiteSpace(query.SortBy)){
+                if(query.SortBy.Equals("Title", StringComparison.OrdinalIgnoreCase)){
+                    book = query.IsDescending ? book.OrderByDescending(b => b.Title) : book.OrderBy(b => b.Title); 
+                }
+            }
+
+            return await book.ToListAsync();
         }
 
         public async Task<Books?> GetById(int id)
