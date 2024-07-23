@@ -3,6 +3,7 @@ using LMProject.Helpers;
 using LMProject.Interfaces;
 using LMProject.Mapper;
 using LMProject.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMProject.Controllers
@@ -23,6 +24,7 @@ namespace LMProject.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if(!ModelState.IsValid)

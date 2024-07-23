@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LMProject.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LMProject.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions dbContextOptions)
         : base(dbContextOptions)
@@ -34,6 +36,19 @@ namespace LMProject.Data
                 .HasOne(b => b.Book)
                 .WithMany(ab => ab.AuthorsBooks)
                 .HasForeignKey(a => a.BookId);
+
+            List<IdentityRole> roles = new List<IdentityRole>
+            {
+                new IdentityRole{
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+                new IdentityRole{
+                    Name = "User",
+                    NormalizedName = "USER"
+                }
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
         }
     }
 }

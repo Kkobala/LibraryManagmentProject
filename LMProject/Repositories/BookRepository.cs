@@ -48,17 +48,22 @@ namespace LMProject.Repositories
         {
             var book = _db.Books.Include(b => b.AuthorsBooks).ThenInclude(a => a.Author).AsQueryable();
 
+            //to search books with title
             if(!string.IsNullOrWhiteSpace(query.Title)){
                 book = book.Where(b => b.Title.Contains(query.Title));
             }
 
+            //sort books by title
             if(!string.IsNullOrWhiteSpace(query.SortBy)){
                 if(query.SortBy.Equals("Title", StringComparison.OrdinalIgnoreCase)){
                     book = query.IsDescending ? book.OrderByDescending(b => b.Title) : book.OrderBy(b => b.Title); 
                 }
             }
 
-            return await book.ToListAsync();
+            //pagination
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+
+            return await book.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<Books?> GetById(int id)
